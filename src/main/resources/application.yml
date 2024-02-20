@@ -1,14 +1,20 @@
+server:
+  port: 8181
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/madishop
+    url: jdbc:mysql://localhost:3306/medishop
     username: root
     password: ROOT
-    
   jpa:
+    database: MYSQL
     hibernate:
       ddl-auto: update
     show-sql: true
+    generate-ddl: true
+      
     
-server:
-  port: 8185
+    
+      
+  
