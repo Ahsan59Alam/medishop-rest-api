@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.CustomerDao;
@@ -12,10 +13,15 @@ import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.CustomerService;
 import com.jsp.medishop.verification.EmailPasswordVerification;
 
+import jakarta.servlet.http.HttpSession;
+
 
 @Service
 public class CustomerServiceImpl implements CustomerService{
 
+	@Autowired
+	private HttpSession httpSession;
+	
 	@Autowired
 	private CustomerDao dao;
 	
@@ -86,4 +92,42 @@ public class CustomerServiceImpl implements CustomerService{
 		return null;
 	}
 
+	@Override
+	public ResponseStructure<Customer> loginCustomerByEmailAndPasswordService(Customer customer) {
+		Customer customer2=dao.loginCustomerByEmailAndPasswordDao(customer);
+		
+		if(customer2!=null) {
+			if(customer2.getPassword().equals(customer.getPassword())) {
+				httpSession.setAttribute("customerEmail", customer2.getEmail());
+				structure.setStatus(HttpStatus.OK.value());
+				structure.setMsg("customer---login---successfully");
+				customer.setPassword("********");
+				structure.setData(customer2);
+			}else {
+				structure.setStatus(HttpStatus.NOT_FOUND.value());
+				structure.setMsg("invalid---password---please----try----again");
+				structure.setData(customer);
+			}
+		}else {
+			
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+			structure.setMsg("invalid---email---please----try----again");
+			customer.setPassword("********");
+			structure.setData(customer2);
+		}
+		return structure;
+	}
+
+	@Override
+	public ResponseEntity<String> logoutCustomerService() {
+		if(httpSession.getAttribute("customerEmail")!=null) {
+			return new ResponseEntity<String> ("Logout---Successfully!", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("first---login---then---logout", HttpStatus.OK);
+		}
+		
+	}
+	
+
+	
 }

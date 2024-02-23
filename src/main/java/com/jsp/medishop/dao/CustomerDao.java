@@ -18,5 +18,6 @@ public interface CustomerDao {
 	
 	public Customer deleteCustomerByEmailDao(String email);
 
-
+	public Customer loginCustomerByEmailAndPasswordDao(Customer customer);
+	
 }

@@ -3,11 +3,14 @@ package com.jsp.medishop.dao.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.jsp.medishop.dao.CustomerDao;
 import com.jsp.medishop.dto.Customer;
 import com.jsp.medishop.repository.CustomerRepository;
 
+
+@Repository
 public class CustomerDaoImpl implements CustomerDao{
 
 	
@@ -56,5 +59,15 @@ public class CustomerDaoImpl implements CustomerDao{
 		}
 		return customer;
 	}
+
+	@Override
+	public Customer loginCustomerByEmailAndPasswordDao(Customer customer) {
+		
+		return CustomerRepo.findByEmail(customer.getEmail());
+	}
+
+	
+
+	
 
 }

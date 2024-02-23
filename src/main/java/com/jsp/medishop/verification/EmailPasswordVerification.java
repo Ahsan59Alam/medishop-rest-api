@@ -2,6 +2,9 @@ package com.jsp.medishop.verification;
 
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class EmailPasswordVerification {
 	
 	public String verifyEmail(String email) {

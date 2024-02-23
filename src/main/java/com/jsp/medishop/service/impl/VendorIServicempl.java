@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.VendorDao;
 import com.jsp.medishop.dto.Vendor;
@@ -11,8 +14,13 @@ import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.VendorService;
 import com.jsp.medishop.verification.EmailPasswordVerification;
 
-public class VendorImpl implements VendorService{
+import jakarta.servlet.http.HttpSession;
+
+@Service
+public class VendorIServicempl implements VendorService{
 	
+	@Autowired
+	private HttpSession httpSession;
 	
 	@Autowired
 	private VendorDao dao;
@@ -79,6 +87,67 @@ public class VendorImpl implements VendorService{
 	public ResponseStructure<Vendor> deleteVendorByEmailService(String email) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ResponseStructure<Vendor> loginVendorByEmailAndPasswordService(String email, String password) {
+		Vendor vendor=dao.getVendorByEmailDao(email);
+		if (vendor!=null) {
+			
+			if((vendor.getPassword().equals(password)) && (vendor.getVendorStatus().equalsIgnoreCase(password))) {
+				httpSession.setAttribute(password, vendor);
+				structure.setStatus(HttpStatus.OK.value());
+				structure.setMsg("vendor--login--successfully");
+				vendor.setPassword("************");
+				structure.setData(vendor);
+				
+			}else {
+				structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+				structure.setMsg("Wrong password ...you are not verified pleade contact admin");
+				vendor.setPassword(password);
+				structure.setData(vendor);
+			}
+			
+		}else {
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+			structure.setMsg(" email increact");
+			vendor.setEmail(email);
+			structure.setData(vendor);
+			
+		}
+		return structure;
+	}
+
+	
+	/**
+	 * logout vendor from session
+	 */
+	
+	@Override
+	public ResponseEntity<String> logoutVendorService() {
+		if(httpSession.getAttribute("vendorEmail")!=null) {
+			httpSession.invalidate();
+			return new ResponseEntity<String>("vendor logout seccess", HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<String>("Please login then logout", HttpStatus.NOT_ACCEPTABLE);
+			
+			
+		}
+		
+	}
+
+	@Override
+	public ResponseEntity<String> vendorVerifyByIdService(int id) {
+	
+		if(httpSession.getAttribute("adminEmail")!=null) {
+			dao.vendorVerifyByIdDao(id);
+			return new ResponseEntity<String>("vendor verified successfully",HttpStatus.OK);
+			
+		}else {
+			return new ResponseEntity<String>("please login with admin and then verify",HttpStatus.NOT_ACCEPTABLE);
+			
+		}
 	}
 
 }

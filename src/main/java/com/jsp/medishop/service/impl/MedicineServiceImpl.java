@@ -5,14 +5,21 @@ import java.util.List;
 import org.hibernate.grammars.hql.HqlParser.IsEmptyPredicateContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.MedicineDao;
 import com.jsp.medishop.dto.Medicine;
 import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.MedicineService;
 
+import jakarta.servlet.http.HttpSession;
 
+@Service
 public class MedicineServiceImpl implements MedicineService{
+	
+	
+	@Autowired
+	private HttpSession httpSession;
 	
 	@Autowired
 	private MedicineDao dao;
@@ -25,16 +32,25 @@ public class MedicineServiceImpl implements MedicineService{
 
 	@Override
 	public ResponseStructure<Medicine> saveMedicineService(Medicine medicine) {
-		Medicine medicine2=dao.saveMedicineDao(medicine);
-		if (medicine2 !=null) {
-			resStructure.setStatus(HttpStatus.ACCEPTED.value());
-			resStructure.setMsg("Data Stored");
-			resStructure.setData(medicine2);
+		
+		if(httpSession.getAttribute("vendorEmail")!=null) {
+			Medicine medicine2=dao.saveMedicineDao(medicine);
+
+			if (medicine2 !=null) {
+				resStructure.setStatus(HttpStatus.ACCEPTED.value());
+				resStructure.setMsg("medicine addedd");
+				resStructure.setData(medicine2);
+			}else {
+				resStructure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+				resStructure.setMsg("Data is not stored check your code");
+				resStructure.setData(null);
+			}
 		}else {
 			resStructure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
-			resStructure.setMsg("Data is not stored check your code");
+			resStructure.setMsg("please login with vendor and then add medicine....");
 			resStructure.setData(null);
 		}
+		
 		return resStructure;
 	}
 

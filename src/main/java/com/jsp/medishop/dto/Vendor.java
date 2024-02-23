@@ -13,7 +13,6 @@ import lombok.Data;
 public class Vendor {
 	
 	@Id
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private String name;
 	private String email;
@@ -22,7 +21,7 @@ public class Vendor {
 	private long adhar;
 	private String password;
 	private String address;
-	@Column(name = "vendor_status", nullable = true)
+	@Column(name = "vendor_status")
 	private String vendorStatus="inactive";
 	
 	@ManyToMany

@@ -25,7 +25,7 @@ public class Customer {
 	@Column(unique = true, nullable = true, length = 12)
 	private long phone;
 	
-	@ManyToMany(mappedBy = "Customers")
+	@ManyToMany
 	private List<Vendor> vendors;
 	
 	

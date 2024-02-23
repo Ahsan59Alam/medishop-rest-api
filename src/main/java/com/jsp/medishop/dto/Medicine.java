@@ -27,6 +27,9 @@ public class Medicine {
 	private double price;
 	@Column(length = 245)
 	private String description;
+	@Column(length = 8)
+	private String medicine_status="inactive";
+	
 	
 	@ManyToMany(mappedBy = "medicines")
 	private List<Vendor> vendors;
