@@ -7,6 +7,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
+
+
+/**
+ * @author Ahsan Alam
+ *
+ */
+
+
 @Entity
 @Data
 public class Admin {

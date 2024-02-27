@@ -33,13 +33,13 @@ public class AdminController {
 	}
 	
 
-	@RequestMapping("/logout")
+	@GetMapping("/logout")
 	public ResponseEntity<String> logoutAdminController() {
 		return adminService.logoutAdminSrevice();
 	}
 	
 	
-	@PostMapping(value ="/verifyVendor/{id}")
+	@GetMapping(value ="/verifyVendor/{id}")
 	public ResponseEntity<String> vendorVerifyByIdService(@PathVariable int id) {
 		return vendorService.vendorVerifyByIdService(id);
 	}

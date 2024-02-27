@@ -67,8 +67,17 @@ public class VendorIServicempl implements VendorService{
 
 	@Override
 	public ResponseStructure<Vendor> getVendorByEmailService(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		Vendor vendor=dao.getVendorByEmailDao(email);
+		if(vendor!=null) {
+			structure.setData(vendor);
+			structure.setMsg("vendor founded");
+			structure.setStatus(HttpStatus.FOUND.value());
+		}else {
+			structure.setData(vendor);
+			structure.setMsg("vendor not founded");
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure;
 	}
 
 	@Override
@@ -95,7 +104,7 @@ public class VendorIServicempl implements VendorService{
 		if (vendor!=null) {
 			
 			if((vendor.getPassword().equals(password)) && (vendor.getVendorStatus().equalsIgnoreCase(password))) {
-				httpSession.setAttribute(password, vendor);
+				httpSession.setAttribute("vendorEmail", email);
 				structure.setStatus(HttpStatus.OK.value());
 				structure.setMsg("vendor--login--successfully");
 				vendor.setPassword("************");

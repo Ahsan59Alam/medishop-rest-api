@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -30,8 +32,10 @@ public class Medicine {
 	@Column(length = 8)
 	private String medicine_status="inactive";
 	
-	
+
+//	@ManyToMany(cascade = CascadeType.ALL)
 	@ManyToMany(mappedBy = "medicines")
+//	@JsonIgnore
 	private List<Vendor> vendors;
 	
 	

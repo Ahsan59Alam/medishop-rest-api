@@ -13,26 +13,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
-@RequestMapping(value ="/vendor")
+@RequestMapping(value = "/vendor")
 public class VendorController {
-	
+
 	@Autowired
 	private VendorService service;
-	
+
 	@PostMapping(value = "/insert")
 	public ResponseStructure<Vendor> saveVendorController(@RequestBody Vendor vendor) {
 		return service.saveVendorService(vendor);
 	}
-	
-	@GetMapping("/loginVender/{email}/{password}")
-	public ResponseStructure<Vendor> loginVendorByEmailAndPasswordController(@RequestBody String email, String password) {
+
+	@GetMapping("/loginVendor/{email}/{password}")
+	public ResponseStructure<Vendor> loginVendorByEmailAndPasswordController(@RequestBody String email,
+			String password) {
 		return service.loginVendorByEmailAndPasswordService(email, password);
-		
+
 	}
-	
-	
 
 	/**
 	 * logout vendor from session
@@ -42,6 +40,4 @@ public class VendorController {
 		return service.logoutVendorService();
 	}
 
-
 }
- 
