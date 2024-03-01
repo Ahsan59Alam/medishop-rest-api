@@ -45,8 +45,8 @@ public class CustomerServiceImpl implements CustomerService{
 		if (email!=null) {
 			if (password!=null) {
 				int currentYear= LocalDate.now().getYear();
-				int currentDob=customer.getDob().getYear();
-				int age =currentYear- currentDob;
+				int cutomerDobYear=customer.getDob().getYear();
+				int age =currentYear- cutomerDobYear;
 				if(age >= 18) {
 					dao.saveCustomerDao(customer);
 					structure.setData(customer);
