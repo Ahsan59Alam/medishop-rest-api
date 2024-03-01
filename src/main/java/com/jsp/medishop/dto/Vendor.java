@@ -27,8 +27,12 @@ public class Vendor {
 	@ManyToMany
 	private List<Customer> customers;
 	
-	@ManyToMany
+	
+	@ManyToMany(mappedBy = "vendors")
 	private List<Medicine> medicines;
+	
+	@ManyToMany
+	private Admin admin;
 	
 	
 	

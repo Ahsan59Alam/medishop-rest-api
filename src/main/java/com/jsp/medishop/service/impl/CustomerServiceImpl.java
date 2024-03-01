@@ -1,5 +1,6 @@
 package com.jsp.medishop.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 
 
 @Service
+@SuppressWarnings("unused")
 public class CustomerServiceImpl implements CustomerService{
 
 	@Autowired
@@ -42,9 +44,20 @@ public class CustomerServiceImpl implements CustomerService{
 		
 		if (email!=null) {
 			if (password!=null) {
-				structure.setData(customer);
-				structure.setMsg("Data Insered!!");
-				structure.setStatus(HttpStatus.CREATED.value());
+				int currentYear= LocalDate.now().getYear();
+				int currentDob=customer.getDob().getYear();
+				int age =currentYear- currentDob;
+				if(age >= 18) {
+					dao.saveCustomerDao(customer);
+					structure.setData(customer);
+					structure.setMsg("Data Insered!!");
+					structure.setStatus(HttpStatus.CREATED.value());
+					
+				} else {
+					structure.setData(customer);
+					structure.setMsg("you are not eligible your are is less then 18!!");
+					structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+				}
 				
 			}else {
 				structure.setData(customer);
@@ -59,7 +72,7 @@ public class CustomerServiceImpl implements CustomerService{
 			structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
 			
 		}
-		return null;
+		return structure;
 	}
 
 	@Override

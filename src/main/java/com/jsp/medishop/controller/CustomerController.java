@@ -1,6 +1,9 @@
 package com.jsp.medishop.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,16 +23,21 @@ public class CustomerController {
 	
 	
 	@PostMapping(value="/insert")
-	public ResponseStructure<Customer> saveCustomerController(@RequestBody Customer customer) {
+	public ResponseStructure<Customer> saveCustomerController(@RequestBody Customer customer)throws IOException {
 		
 		return service.saveCustomerService(customer);
 	}
 	
 	
-	@GetMapping(value="/customerLogin")
+	@GetMapping(value="/customerLogin/{email}/{password}")
 	public ResponseStructure<Customer> loginCustomerByEmailAndPasswordController(@RequestBody Customer customer) {
 		
 		return service.loginCustomerByEmailAndPasswordService(customer);
+	}
+	
+	@GetMapping(value="/logoutCustomer")
+	public ResponseEntity<String> logoutCustomerService(){
+		return service.logoutCustomerService();
 	}
 
 }

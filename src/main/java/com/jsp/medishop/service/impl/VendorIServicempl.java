@@ -120,6 +120,7 @@ public class VendorIServicempl implements VendorService{
 		}else {
 			structure.setStatus(HttpStatus.NOT_FOUND.value());
 			structure.setMsg(" email increact");
+			vendor.setPassword("************");
 			vendor.setEmail(email);
 			structure.setData(vendor);
 			
@@ -149,7 +150,8 @@ public class VendorIServicempl implements VendorService{
 	@Override
 	public ResponseEntity<String> vendorVerifyByIdService(int id) {
 	
-		if(httpSession.getAttribute("adminEmail")!=null) {
+		String adminEmail=(String) httpSession.getAttribute("adminEmail");
+		if(adminEmail!=null) {
 			dao.vendorVerifyByIdDao(id);
 			return new ResponseEntity<String>("vendor verified successfully",HttpStatus.OK);
 			

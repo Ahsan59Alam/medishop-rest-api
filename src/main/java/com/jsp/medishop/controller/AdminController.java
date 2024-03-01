@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,12 +14,17 @@ import com.jsp.medishop.dao.AdminDao;
 import com.jsp.medishop.dto.Admin;
 import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.AdminService;
+import com.jsp.medishop.service.MedicineService;
 import com.jsp.medishop.service.VendorService;
 
 import jakarta.servlet.http.HttpSession;
 
 @RestController
 public class AdminController {
+	
+	
+	@Autowired
+	private MedicineService medicineService;
 	
 	@Autowired
 	private VendorService vendorService;
@@ -43,4 +49,12 @@ public class AdminController {
 	public ResponseEntity<String> vendorVerifyByIdService(@PathVariable int id) {
 		return vendorService.vendorVerifyByIdService(id);
 	}
+	
+	
+	@PutMapping(value= "/verifyMedicine/{medicineId}/{vendorId}")
+	public ResponseEntity<String> veerifyMedicineStatusByAdminController(@PathVariable int medicineId, @PathVariable int vendorId){
+		return medicineService.verifyMedicineStatusByAdminService(medicineId, vendorId);
+	}
+	
+	
 }

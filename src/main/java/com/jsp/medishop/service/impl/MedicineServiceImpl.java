@@ -7,6 +7,8 @@ import java.util.List;
 import org.hibernate.grammars.hql.HqlParser.IsEmptyPredicateContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.MedicineDao;
@@ -76,6 +78,66 @@ public class MedicineServiceImpl implements MedicineService{
 			resStructure2.setMsg("Data is not found might be table is empty or check your code");
 			resStructure2.setData(medicine);
 		}
+		return resStructure2;
+	}
+
+	@Override
+	public ResponseEntity<String> verifyMedicineStatusByAdminService(int medicineId, int vendodId) {
+		String adminEmail=(String) httpSession.getAttribute("adminEmail");
+		
+		
+		if(adminEmail!=null) {
+			
+			Vendor vendor=vendorDao.getVendorByIdDao(vendodId);
+			
+			if(vendor!=null) {
+				List<Medicine> medicines=vendor.getMedicines();
+				
+				if(medicines.isEmpty()) {
+					for(Medicine medicine: medicines) {
+						if(medicine.getId()==medicineId) {
+							medicine.setMedicine_status("active");
+							boolean b=dao.verifyMedicineStatusByAdminDao(medicine);
+							
+							return (b)?new ResponseEntity<String> ("medicine--verified",HttpStatusCode.valueOf(200)):new ResponseEntity<String>("not---verified", HttpStatusCode.valueOf(404));
+						}
+					}
+				}
+			}
+			
+		}
+		return new ResponseEntity<String>("please login as admin then verified", HttpStatusCode.valueOf(200));
+	}
+
+	@Override
+	public ResponseStructure<List<Medicine>> getAllMedicineByNameService(String name) {
+		String customerEmail=(String) httpSession.getAttribute("customerEmail");
+		String vendorEmail= (String) httpSession.getAttribute("vendorEmail");
+		String adminEmail= (String) httpSession.getAttribute("adminEmail");
+				
+		if((customerEmail!=null)||(vendorEmail!=null)|(adminEmail!=null)) {
+			
+			List<Medicine> medicines=dao.getAllMedicineByNameDao(name);
+			
+			if(!medicines.isEmpty()) {
+				resStructure2.setMsg("medicine are not available");
+				resStructure2.setStatus(HttpStatus.FOUND.value());
+				resStructure2.setData(medicines);
+			}else {
+				
+				resStructure2.setMsg("find below medicine details");
+				resStructure2.setStatus(HttpStatus.NOT_FOUND.value());
+				resStructure2.setData(medicines);
+			}
+		}else {
+			
+			resStructure2.setMsg("please login and then search");
+			resStructure2.setStatus(HttpStatus.FOUND.value());
+			resStructure2.setData(null);
+		}
+				
+				
+				
 		return resStructure2;
 	}
 	

@@ -16,7 +16,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Medicine {
-	
+
 	@Id
 	private int id;
 	private String name;
@@ -30,14 +30,14 @@ public class Medicine {
 	@Column(length = 245)
 	private String description;
 	@Column(length = 8)
-	private String medicine_status="inactive";
-	
+	private String medicine_status = "inactive";
 
-//	@ManyToMany(cascade = CascadeType.ALL)
-	@ManyToMany(mappedBy = "medicines")
-//	@JsonIgnore
+//	@ManyToMany(mappedBy = "medicines")
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JsonIgnore
 	private List<Vendor> vendors;
 	
-	
+	@ManyToMany(mappedBy = "medicines")
+	private List<Customer> customers;
 
 }
