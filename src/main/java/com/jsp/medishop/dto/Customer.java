@@ -1,5 +1,6 @@
 package com.jsp.medishop.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.annotation.Transient;
@@ -21,7 +22,7 @@ public class Customer {
 	private int id;
 	private String name;
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	private String dob;
+	private LocalDate dob;
 	@Column(unique = true, nullable = false)
 	private String email;
 	@Column(length = 8)
