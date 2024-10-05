@@ -1,102 +1,69 @@
 package com.jsp.medishop.dao.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.jsp.medishop.dao.VendorDao;
-import com.jsp.medishop.dto.Admin;
 import com.jsp.medishop.dto.Vendor;
-import com.jsp.medishop.repository.AdminRepository;
 import com.jsp.medishop.repository.VendorRepository;
 
-import jakarta.servlet.http.HttpSession;
-
+/**
+ * @author Ahsan Alam
+ */
 @Repository
 class VendorDaoImpl implements VendorDao {
-	
+
 	@Autowired
-	private HttpSession httpSession;
-	
-	@Autowired
-	private VendorRepository VendorRepo;
-	
-	@Autowired
-	private AdminRepository adminRepo;
+	private VendorRepository vendorRepository;
 
 	@Override
 	public Vendor saveVendorDao(Vendor vendor) {
-		
-		return VendorRepo.save(vendor);
+		return vendorRepository.save(vendor);
 	}
 
 	@Override
 	public Vendor getVendorByIdDao(int id) {
-		
-		Optional<Vendor> optional=VendorRepo.findById(id);
-		
-		if( optional.isPresent()) {
-			return optional.get();
-			
-		}else {
+		try {
+			return vendorRepository.findById(id).get();
+		} catch (Exception e) {
 			return null;
-			
 		}
-		
-		
 	}
 
 	@Override
 	public Vendor getVendorByEmailDao(String email) {
-		
-		return VendorRepo.findByEmail(email);
+		return vendorRepository.findByEmail(email);
 	}
 
 	@Override
-	public List<Vendor> getVendorDao() {
-		
-		return VendorRepo.findAll();
+	public List<Vendor> getAllVendorsDao() {
+		return vendorRepository.findAll();
 	}
 
 	@Override
 	public Vendor updateVendorByEmailDao(Vendor vendor) {
-		Vendor vendor2=getVendorByEmailDao(vendor.getEmail());
-		if(vendor2 != null) {
-			return VendorRepo.save(vendor);
-			
+		Vendor vendor2 = getVendorByEmailDao(vendor.getEmail());
+		if (vendor2 != null) {
+			return vendorRepository.save(vendor);
 		}
 		return null;
 	}
 
 	@Override
-	public Vendor deleteVendorByEmailDao(String email) {
-		Vendor vendor=getVendorByEmailDao(email);
+	public boolean deleteVendorByEmailDao(String email) {
+		Vendor vendor = getVendorByEmailDao(email);
 		if (vendor != null) {
-			VendorRepo.delete(vendor);
-			return null;
+			vendorRepository.delete(vendor);
+			return true;
 		}
-		return vendor;
+		return false;
 	}
 
 	@Override
-	public Vendor vendorVerifyByIdDao(int id) {
+	public void vendorVerifyByIdDao(int id) {
+		// TODO Auto-generated method stub
 		
-		String adminEmail=(String) httpSession.getAttribute("adminEmail");
-		
-		Vendor vendor=getVendorByIdDao(id);
-		
-		Admin admin=adminRepo.findByEmail(adminEmail);
-		
-		if(vendor!=null) {
-			vendor.setVendorStatus("active");
-			vendor.setAdmin(admin);
-			return VendorRepo.save(vendor);
-			
-			
-		}
-		return null;
 	}
-
 }

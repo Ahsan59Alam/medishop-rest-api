@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.CustomerDao;
 import com.jsp.medishop.dao.MedicineDao;
@@ -16,6 +17,8 @@ import com.jsp.medishop.service.OrderEntityService;
 
 import jakarta.servlet.http.HttpSession;
 
+
+@Service
 public class OrderEntityServiceImpl implements OrderEntityService{
 
 	

@@ -1,75 +1,146 @@
 package com.jsp.medishop.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.AdminDao;
+import com.jsp.medishop.dao.MedicineDao;
+import com.jsp.medishop.dao.VendorDao;
 import com.jsp.medishop.dto.Admin;
+import com.jsp.medishop.dto.Medicine;
+import com.jsp.medishop.dto.Vendor;
+import com.jsp.medishop.exception.InvalidUserCredentialException;
 import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.AdminService;
+import com.jsp.medishop.service.VendorService;
 
 import jakarta.servlet.http.HttpSession;
 
-
+/**
+ * @author Ahsan Alam
+ */
 @Service
-public class AdminServiceImpl implements AdminService{
+public class AdminServiceImpl implements AdminService {
 
-	
-	
 	@Autowired
-	private HttpSession httpSession;
-	
+	private HttpSession session;
 	@Autowired
-	private AdminDao adminDao;
-	
+	private AdminDao dao;
 	@Autowired
-	private ResponseStructure<Admin> responseStructure;
-	
-	@Override
-	public ResponseStructure<Admin> loginAdminByEmailAndPasswordService(Admin admin) {
-		
-		
-		Admin admin2=adminDao.loginAdminByEmailAndPasswordDao(admin);
-		
-		if(admin2!=null) {
-			if(admin2.getPassword().equals(admin.getPassword())) {
-				httpSession.setAttribute("adminEmail", admin2.getEmail());
-				responseStructure.setStatus(HttpStatus.OK.value());
-				responseStructure.setMsg("admin---login---successfully");
-				admin2.setPassword("************");
-				responseStructure.setData(admin2);
-			}else {
-				responseStructure.setStatus(HttpStatus.NOT_FOUND.value());
-				responseStructure.setMsg("Invalid---Password---please---try--again");
-				responseStructure.setData(admin);
+	private VendorDao vendorDao;
+	@Autowired
+	private MedicineDao medicineDao;
+	@Autowired
+	private VendorService vendorService;
+	@Autowired
+	private ResponseStructure<Admin> structure;
+	@Autowired
+	private ResponseStructure<List<Vendor>> structure2;
+	@Autowired
+	private ResponseStructure<Vendor> structure3;
+
+	public ResponseStructure<Admin> getAdminByEmailService(String email, String password) {
+		Admin admin = dao.getAdminByEmailDao(email);
+		if (admin != null) {
+			if (admin.getPassword().equals(password)) {
+				session.setAttribute("adminEmail", email);
+				structure.setData(admin);
+				structure.setMsg("Logged in successfully!!!");
+				structure.setStatus(HttpStatus.FOUND.value());
+			} else {
+				throw new InvalidUserCredentialException();
 			}
-		}else {
-			responseStructure.setStatus(HttpStatus.NOT_FOUND.value());
-			responseStructure.setMsg("Invalid---email---please---try--again");
-			admin.setPassword("***********");
-			responseStructure.setData(admin);
+		} else {
+			throw new InvalidUserCredentialException();
 		}
-		
-		return responseStructure;
+		return structure;
 	}
 
 	@Override
-	public ResponseEntity<String> logoutAdminSrevice() {
-		
-		if(httpSession.getAttribute("adminEmail")!=null) {
-			httpSession.invalidate();
-			return new ResponseEntity<String>("Logout--Successfully", HttpStatus.OK);
-			
-		}else {
-			
-			return new ResponseEntity<String>("first LOgin then logout", HttpStatus.OK);
-			
+	public ResponseEntity<String> logoutAdminService() {
+		if (session.getAttribute("adminEmail") != null) {
+			session.invalidate();
+			return new ResponseEntity<String>("Logged out Successfully", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Invaild request please login first!", HttpStatus.OK);
 		}
-			
-		
 	}
 
+	@Override
+	public ResponseStructure<List<Vendor>> getAllVendorsByAdminService() {
+		if (session.getAttribute("adminEmail") != null) {
+			return vendorService.getAllVendorsService();
+		} else {
+			structure2.setData(null);
+			structure2.setMsg("Please login as admin to get all data!");
+			structure2.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure2;
+	}
+
+	@Override
+	public ResponseStructure<Vendor> updateVendorStatusByVendorIdService(int id, String status) {
+		String email = (String) session.getAttribute("adminEmail");
+		if (email != null) {
+			Vendor vendor = vendorDao.getVendorByIdDao(id);
+			if (vendor != null) {
+				Admin admin = dao.getAdminByEmailDao(email);
+				vendor.setAdmin(admin);
+				vendor.setVendorStatus(status);
+				vendorDao.updateVendorByEmailDao(vendor);
+				structure3.setData(vendor);
+				structure3.setMsg("status updated!");
+				structure3.setStatus(HttpStatus.OK.value());
+			} else {
+				structure3.setData(null);
+				structure3.setMsg("No record found!");
+				structure3.setStatus(HttpStatus.NOT_FOUND.value());
+			}
+		} else {
+			structure3.setData(null);
+			structure3.setMsg("Please login as admin to update status!");
+			structure3.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure3;
+	}
+
+	@Override
+	public ResponseStructure<Vendor> updateMedicineStatusByVendorIdService(int vendorId, int medicineId,
+			String status) {
+		String email = (String) session.getAttribute("adminEmail");
+		if (email != null) {
+			Vendor vendor = vendorDao.getVendorByIdDao(vendorId);
+			if (vendor != null) {
+				List<Medicine> list = vendor.getMedicines();
+				if (!list.isEmpty()) {
+					for (Medicine medicine : list) {
+						if (medicine.getId() == medicineId) {
+							if (medicineDao.updateMedicineStatusByIdDao(medicineId, status) != null)
+								structure3.setData(vendor);
+							structure3.setMsg("status upaated");
+							structure3.setStatus(HttpStatus.ACCEPTED.value());
+						}
+					}
+				} else {
+					structure3.setData(vendor);
+					structure3.setMsg("not medicines found!");
+					structure3.setStatus(HttpStatus.OK.value());
+				}
+			} else {
+				structure3.setData(null);
+				structure3.setMsg("No data found!");
+				structure3.setStatus(HttpStatus.NOT_FOUND.value());
+			}
+		} else {
+			structure3.setData(null);
+			structure3.setMsg("Please login as admin first before upadting medicines!");
+			structure3.setStatus(HttpStatus.BAD_REQUEST.value());
+		}
+		return structure3;
+	}
 
 }

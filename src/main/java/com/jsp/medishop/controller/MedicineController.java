@@ -12,25 +12,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jsp.medishop.dto.Medicine;
 import com.jsp.medishop.response.ResponseStructure;
-import com.jsp.medishop.service.MedicineService;
+import com.jsp.medishop.service.MediniceService;
 
+/**
+ * @author Ahsan Alam
+ */
 @RestController
-@RequestMapping(value ="/medicine")
+@RequestMapping(value = "/medicine")
 public class MedicineController {
-	
+
 	@Autowired
-	private MedicineService mediService;
-	
-	@PostMapping(value ="/saveMedicine")
-	public ResponseStructure<Medicine> saveMedicineController(@RequestBody Medicine medicine){
-		return mediService.saveMedicineService(medicine);
+	private MediniceService service;
+
+	@PostMapping(value = "/insert")
+	public ResponseStructure<Medicine> saveMedicineController(@RequestBody Medicine medicine) {
+		return service.saveMedicineService(medicine);
 	}
-	
-	
-	@GetMapping(value="/getAllMedicineByName/{name}")
-	public ResponseStructure<List<Medicine>> getAllMedicineByNameDao(@PathVariable String name){
-		
-		return mediService.getAllMedicineByNameService(name);
+
+	@GetMapping(value = "/getAllRecords")
+	public ResponseStructure<List<Medicine>> getAllMedicinesController() {
+		return service.getAllMedicinesService();
+	}
+
+	@GetMapping(value = "/getByName/{name}")
+	public ResponseStructure<List<Medicine>> getMedicinesByNameController(@PathVariable String name) {
+		return service.getMedicinesByNameService(name);
 	}
 
 }

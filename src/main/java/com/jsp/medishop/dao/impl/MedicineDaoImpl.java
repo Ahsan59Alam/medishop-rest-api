@@ -1,7 +1,7 @@
 package com.jsp.medishop.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,55 +10,48 @@ import com.jsp.medishop.dao.MedicineDao;
 import com.jsp.medishop.dto.Medicine;
 import com.jsp.medishop.repository.MedicineRepository;
 
-
-
+/**
+ * @author Ahsan Alam
+ */
 @Repository
 public class MedicineDaoImpl implements MedicineDao {
-	
-	
+
 	@Autowired
-	private MedicineRepository MedicineRepo;
+	private MedicineRepository repository;
 
 	@Override
 	public Medicine saveMedicineDao(Medicine medicine) {
-		
-		return MedicineRepo.save(medicine);
+		return repository.save(medicine);
 	}
 
 	@Override
-	public List<Medicine> getAllMedicineDao() {
-		
-		return MedicineRepo.findAll();
+	public List<Medicine> getAllMedicinesDao() {
+		return repository.findAll();
 	}
 
 	@Override
-	public boolean verifyMedicineStatusByAdminDao(Medicine medicine) {
-		
-		return (MedicineRepo.save(medicine)!=null) ? true : false;
+	public List<Medicine> getMedicinesByNameDao(String name) {
+		return repository.findByName(name);
 	}
 
 	@Override
-	public Medicine getMedicineByIdDao(int medicineId) {
-		
-		return MedicineRepo.findById(medicineId);
-	}
-
-	@Override
-	public List<Medicine> getAllMedicineByNameDao(String name) {
-		List<Medicine> medicines = MedicineRepo.findByName(name);
-		List<Medicine> medicine2 = new ArrayList<Medicine>();
-		
-		for(Medicine medicine: medicines) {
-			if(medicine.getMedicine_status().equalsIgnoreCase("active")) {
-				
-				medicine2.add(medicine);
-			}
-			
+	public Medicine updateMedicineStatusByIdDao(int id, String status) {
+		Medicine medicine = repository.findById(id).get();
+		if (medicine != null) {
+			medicine.setStatus(status);
+			return repository.save(medicine);
 		}
-		return medicine2;
-	} 
+		return null;
+	}
 
-	
+	@Override
+	public Medicine getMedicineByIdDao(int id) {
+		try {
 
-	
+			return repository.findById(id).get();
+		} catch (NoSuchElementException e) {
+			return null;
+		}
+	}
+
 }

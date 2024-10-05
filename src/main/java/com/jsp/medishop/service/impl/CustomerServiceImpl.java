@@ -1,6 +1,5 @@
 package com.jsp.medishop.service.impl;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,135 +11,164 @@ import com.jsp.medishop.dao.CustomerDao;
 import com.jsp.medishop.dto.Customer;
 import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.CustomerService;
-import com.jsp.medishop.verification.EmailPasswordVerification;
+import com.jsp.medishop.verification.DataVerification;
 
 import jakarta.servlet.http.HttpSession;
 
-
+/**
+ * @author Ahsan Alam
+ */
 @Service
-@SuppressWarnings("unused")
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
-	private HttpSession httpSession;
-	
+	private HttpSession session;
 	@Autowired
 	private CustomerDao dao;
-	
 	@Autowired
-	private EmailPasswordVerification verification;
-	
+	private DataVerification verification;
 	@Autowired
 	private ResponseStructure<Customer> structure;
-	
 	@Autowired
 	private ResponseStructure<List<Customer>> structure2;
-	
-	
+
 	@Override
 	public ResponseStructure<Customer> saveCustomerService(Customer customer) {
-		String email=verification.verifyEmail(customer.getEmail());
-		String password=verification.VerifyPassword(customer.getPassword());
-		
-		if (email!=null) {
-			if (password!=null) {
-				int currentYear= LocalDate.now().getYear();
-				int cutomerDobYear=customer.getDob().getYear();
-				int age =currentYear- cutomerDobYear;
-				if(age >= 18) {
+		Customer customer2 = dao.getCustomerByEmailDao(customer.getEmail());
+		if (customer2 == null) {
+			String email = verification.verifyEmail(customer.getEmail());
+			String password = verification.verifyPassword(customer.getPassword());
+			if (email != null) {
+				if (password != null) {
+					session.setAttribute("customerEmail", customer.getEmail());
 					dao.saveCustomerDao(customer);
 					structure.setData(customer);
-					structure.setMsg("Data Insered!!");
+					structure.setMsg("Data Inserted!!!!");
 					structure.setStatus(HttpStatus.CREATED.value());
-					
 				} else {
 					structure.setData(customer);
-					structure.setMsg("you are not eligible your are is less then 18!!");
+					structure.setMsg("Please check your password!!!!");
 					structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
 				}
-				
-			}else {
+			} else {
 				structure.setData(customer);
-				structure.setMsg("Please check your password!!");
+				structure.setMsg("Please check your email!!!!");
 				structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
-				
 			}
-		
-		}else {
+		} else {
 			structure.setData(customer);
-			structure.setMsg("Please check your email!!");
+			structure.setMsg("User already exists!!!!");
 			structure.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
-			
 		}
 		return structure;
 	}
 
 	@Override
 	public ResponseStructure<Customer> getCustomerByIdService(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseStructure<Customer> getCustomerByEmailService(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Customer> getCustomerService() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseStructure<List<Customer>> updateCustomerByEmailService(Customer customer) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseStructure<Customer> deleteCustomerByEmailService(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseStructure<Customer> loginCustomerByEmailAndPasswordService(Customer customer) {
-		Customer customer2=dao.loginCustomerByEmailAndPasswordDao(customer);
-		
-		if(customer2!=null) {
-			if(customer2.getPassword().equals(customer.getPassword())) {
-				httpSession.setAttribute("customerEmail", customer2.getEmail());
-				structure.setStatus(HttpStatus.OK.value());
-				structure.setMsg("customer---login---successfully");
-				customer.setPassword("********");
-				structure.setData(customer2);
-			}else {
-				structure.setStatus(HttpStatus.NOT_FOUND.value());
-				structure.setMsg("invalid---password---please----try----again");
-				structure.setData(customer);
-			}
-		}else {
-			
+		Customer customer = dao.getCustomerByIdDao(id);
+		if (customer != null) {
+			structure.setData(customer);
+			structure.setMsg("data found!!!");
+			structure.setStatus(HttpStatus.FOUND.value());
+		} else {
+			structure.setData(customer);
+			structure.setMsg("No record found!!!");
 			structure.setStatus(HttpStatus.NOT_FOUND.value());
-			structure.setMsg("invalid---email---please----try----again");
-			customer.setPassword("********");
-			structure.setData(customer2);
 		}
 		return structure;
 	}
 
 	@Override
-	public ResponseEntity<String> logoutCustomerService() {
-		if(httpSession.getAttribute("customerEmail")!=null) {
-			return new ResponseEntity<String> ("Logout---Successfully!", HttpStatus.OK);
-		}else {
-			return new ResponseEntity<String>("first---login---then---logout", HttpStatus.OK);
+	public ResponseStructure<Customer> getCustomerByEmailService(String email) {
+		Customer customer = dao.getCustomerByEmailDao(email);
+		if (customer != null) {
+			structure.setData(customer);
+			structure.setMsg("data found!!!");
+			structure.setStatus(HttpStatus.FOUND.value());
+		} else {
+			structure.setData(customer);
+			structure.setMsg("No record found!!!");
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
 		}
-		
+		return structure;
 	}
-	
 
-	
+	@Override
+	public ResponseStructure<List<Customer>> getAllCustomersService() {
+		List<Customer> list = dao.getAllCustomersDao();
+		if (!list.isEmpty()) {
+			structure2.setData(list);
+			structure2.setMsg("data found!!!");
+			structure2.setStatus(HttpStatus.FOUND.value());
+		} else {
+			structure2.setData(list);
+			structure2.setMsg("no record found!!!");
+			structure2.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure2;
+	}
+
+	@Override
+	public ResponseStructure<Customer> updateCustomerByEmailService(Customer customer) {
+		Customer customer2 = dao.updateCustomerByEmailDao(customer);
+		if (customer2 != null) {
+			structure.setData(customer2);
+			structure.setMsg("data upadated!!!");
+			structure.setStatus(HttpStatus.OK.value());
+		} else {
+			structure.setData(customer2);
+			structure.setMsg("Not data found!!!");
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure;
+	}
+
+	@Override
+	public ResponseStructure<Customer> deleteCustomerByEmailService(String email) {
+		boolean b = dao.deleteCustomerByEmailDao(email);
+		if (b) {
+			structure.setData(null);
+			structure.setMsg("data deleted!!!");
+			structure.setStatus(HttpStatus.OK.value());
+		} else {
+			structure.setData(null);
+			structure.setMsg("No data found!!!");
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure;
+	}
+
+	@Override
+	public ResponseStructure<Customer> loginCustomerWithEmailService(String email, String password) {
+		Customer customer = dao.getCustomerByEmailDao(email);
+		if (customer != null) {
+			if (customer.getPassword().equals(password)) {
+				session.setAttribute("customerEmail", email);
+				structure.setMsg("Logged in successfully!!!");
+				structure.setStatus(HttpStatus.OK.value());
+				customer.setPassword("*******");
+				structure.setData(customer);
+			} else {
+				structure.setData(null);
+				structure.setMsg("Invalid Password!!!");
+				structure.setStatus(HttpStatus.NOT_FOUND.value());
+			}
+		} else {
+			structure.setData(null);
+			structure.setMsg("Invalid Email!!!");
+			structure.setStatus(HttpStatus.NOT_FOUND.value());
+		}
+		return structure;
+	}
+
+	@Override
+	public ResponseEntity<String> logoutCustomerWithEmailService() {
+		if (session.getAttribute("customerEmail") != null) {
+			session.invalidate();
+			return new ResponseEntity<String>("You Logged out!!!", HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Ivalid request!!!", HttpStatus.BAD_REQUEST);
+		}
+	}
+
 }

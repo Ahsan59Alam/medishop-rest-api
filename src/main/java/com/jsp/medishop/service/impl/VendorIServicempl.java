@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.jsp.medishop.dao.VendorDao;
+import com.jsp.medishop.dto.Medicine;
 import com.jsp.medishop.dto.Vendor;
 import com.jsp.medishop.response.ResponseStructure;
 import com.jsp.medishop.service.VendorService;
@@ -87,7 +88,7 @@ public class VendorIServicempl implements VendorService{
 	}
 
 	@Override
-	public ResponseStructure<List<Vendor>> updateVendorByEmailService(Vendor vendor) {
+	public ResponseStructure<Vendor> updateVendorByEmailService(Vendor vendor) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -159,6 +160,30 @@ public class VendorIServicempl implements VendorService{
 			return new ResponseEntity<String>("please login with admin and then verify",HttpStatus.NOT_ACCEPTABLE);
 			
 		}
+	}
+
+	@Override
+	public ResponseStructure<List<Vendor>> getAllVendorsService() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseStructure<Vendor> loginVendorWithEmailService(String email, String password) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<String> logoutVendorWithEmailService() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseStructure<Vendor> addMedicineWithVendorService(Medicine medicine) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

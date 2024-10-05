@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jsp.medishop.dto.Medicine;
 
-public interface MedicineRepository extends JpaRepository<Medicine, Integer>{
-	
-	public Medicine findById(int medicineId);
-	
+/**
+ * @author Ahsan Alam
+ */
+public interface MedicineRepository extends JpaRepository<Medicine, Integer> {
+
 	public List<Medicine> findByName(String name);
-	
 
 }
